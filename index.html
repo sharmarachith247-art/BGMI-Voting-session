@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BGMI Voting</title>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <style>
+    body { font-family: Arial; background:#0f172a; color:white; text-align:center; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; padding:20px; }
+    .card { background:#1e293b; padding:15px; border-radius:10px; }
+    button { margin-top:10px; padding:8px; border:none; background:green; color:white; cursor:pointer; }
+  </style>
+</head>
+
+<body>
+
+<h1>BGMI Team Voting</h1>
+<div class="grid" id="teams"></div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA4jp7wdtTeiCMAUa8FP0otuNF97ydjlp4",
+  authDomain: "bgmi-voting-session-d7ffe.firebaseapp.com",
+  databaseURL: "https://bgmi-voting-session-d7ffe-default-rtdb.firebaseio.com",
+  projectId: "bgmi-voting-session-d7ffe",
+  storageBucket: "bgmi-voting-session-d7ffe.firebasestorage.app",
+  messagingSenderId: "796086307631",
+  appId: "1:796086307631:web:0b7ca1b1f67f338dbf2fda"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const teams = [
+  "Blaze","BLVK","Krontnix","MadX","Oscr","AVJ","Osiden","Viper",
+  "BLAHk","Quad","Star","Cosmic","S3X","Phaze","Arc","Era"
+];
+
+const container = document.getElementById("teams");
+
+teams.forEach(team => {
+  const div = document.createElement("div");
+  div.className = "card";
+  div.innerHTML = `
+    <h3>${team}</h3>
+    <p id="count-${team}">0 votes</p>
+    <button onclick="vote('${team}')">Vote</button>
+  `;
+  container.appendChild(div);
+
+  db.ref('votes/' + team).on('value', snap => {
+    document.getElementById(`count-${team}`).innerText = (snap.val() || 0) + " votes";
+  });
+});
+
+function vote(team) {
+  db.ref('votes/' + team).transaction(v => (v || 0) + 1);
+}
+</script>
+
+</body>
+</html>
